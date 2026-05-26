@@ -189,7 +189,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
                 ) : (
                   <Eye aria-hidden="true" />
                 )}
-                {showPassword ? t.hide : t.show}
+                {/* {showPassword ? t.hide : t.show} */}
               </Button>
             </div>
           </label>
