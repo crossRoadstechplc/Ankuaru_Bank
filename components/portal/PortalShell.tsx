@@ -32,11 +32,16 @@ export function PortalShell({
         session.roleLabel
       }`;
     }
-    if (welcome) {
+    if (welcome && session.role !== "SUPER_ADMIN") {
       welcome.textContent = `${session.welcome} · ${session.dashboardTitle}`;
     }
 
     window.setTimeout(() => {
+      if (session.defaultSection === "portfolio") {
+        callLegacy((win) => win.showBsPortfolioPreview?.());
+        return;
+      }
+
       const button = document.getElementById(
         `bsn-${session.defaultSection}`,
       ) as HTMLButtonElement | null;

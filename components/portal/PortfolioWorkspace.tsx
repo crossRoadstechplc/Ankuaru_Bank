@@ -2,6 +2,7 @@ import { AuthSession } from "@/components/auth/auth-model";
 import { DetailPanel } from "./DetailPanel";
 import { ExportersSidebar } from "./ExportersSidebar";
 import { PortfolioToolbar } from "./PortfolioToolbar";
+import { RoleDashboardPanel } from "./RoleDashboardPanel";
 
 export function PortfolioWorkspace({ session }: { session: AuthSession }) {
   return (
@@ -16,9 +17,7 @@ export function PortfolioWorkspace({ session }: { session: AuthSession }) {
           role="status"
           aria-live="polite"
         >
-          <p className="portfolio-welcome-text">
-            {session.welcome} · {session.dashboardTitle}
-          </p>
+          <RoleDashboardPanel session={session} />
         </div>
       </div>
       <DetailPanel />

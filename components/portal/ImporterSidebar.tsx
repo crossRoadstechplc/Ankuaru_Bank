@@ -2,6 +2,7 @@
 
 import {
   BadgeHelp,
+  Building2,
   BriefcaseBusiness,
   CircleUserRound,
   CreditCard,
@@ -9,12 +10,16 @@ import {
   FolderOpen,
   Gavel,
   Landmark,
+  KeyRound,
   Package,
   PlusSquare,
   Repeat2,
   Settings,
   Shield,
   Sparkles,
+  SlidersHorizontal,
+  UserCog,
+  UserPlus,
   UsersRound,
 } from "lucide-react";
 import { AuthSession } from "@/components/auth/auth-model";
@@ -53,6 +58,84 @@ const utilityItems = [
   { id: "settings", label: "Settings", icon: Settings },
   { id: "help", label: "Help", icon: BadgeHelp },
 ] as const;
+
+const superAdminItems = [
+  { id: "bank-registration", label: "Register Bank", icon: Building2 },
+  { id: "bank-admin", label: "Create Bank Admin", icon: UserPlus },
+  { id: "credentials", label: "API Credentials", icon: KeyRound },
+] as const;
+
+const bankAdminItems = [
+  { id: "internal-users", label: "Internal Users", icon: UserCog },
+  { id: "client-accounts", label: "Client Accounts", icon: BriefcaseBusiness },
+  { id: "rbac", label: "RBAC Permissions", icon: SlidersHorizontal },
+] as const;
+
+const onboarderItems = [
+  { id: "register-client", label: "Register Client", icon: UserPlus },
+  { id: "manage-clients", label: "Manage Clients", icon: BriefcaseBusiness },
+] as const;
+
+const verifierItems = [
+  { id: "register-client", label: "Register Client", icon: UserPlus },
+  { id: "manage-clients", label: "Manage Clients", icon: BriefcaseBusiness },
+  { id: "verification", label: "Complete Verification", icon: Shield },
+  { id: "issue-lc", label: "Issue LC", icon: KeyRound },
+  { id: "generate-contract", label: "Generate Contract", icon: FileText },
+] as const;
+
+const clientItems = [
+  { id: "registration", label: "Registration", icon: UserPlus },
+  { id: "status", label: "Track Status", icon: SlidersHorizontal },
+] as const;
+
+const roleMenuAccess: Record<
+  AuthSession["role"],
+  { nav: string[]; utility: string[] }
+> = {
+  SUPER_ADMIN: {
+    nav: [],
+    utility: ["risk", "account", "settings", "help"],
+  },
+  BANK_ADMIN: {
+    nav: ["contracts", "settlement", "actors"],
+    utility: ["risk", "account", "settings", "help"],
+  },
+  BANK_ONBOARDER: {
+    nav: [],
+    utility: ["account", "help"],
+  },
+  BANK_VERIFIER: {
+    nav: ["contracts", "settlement"],
+    utility: ["account", "help"],
+  },
+  BANK_RISK: {
+    nav: ["contracts", "settlement"],
+    utility: ["risk", "account", "help"],
+  },
+  CLIENT: {
+    nav: ["auction", "exporters"],
+    utility: ["account", "help"],
+  },
+  WAREHOUSE_OPERATOR: {
+    nav: ["inv", "quality", "settlement"],
+    utility: ["account", "help"],
+  },
+  REGULATOR: {
+    nav: ["contracts", "settlement"],
+    utility: ["risk", "account", "help"],
+  },
+};
+
+function visibleNavItems(role: AuthSession["role"]) {
+  const allowed = new Set(roleMenuAccess[role].nav);
+  return navItems.filter((item) => allowed.has(item.id));
+}
+
+function visibleUtilityItems(role: AuthSession["role"]) {
+  const allowed = new Set(roleMenuAccess[role].utility);
+  return utilityItems.filter((item) => allowed.has(item.id));
+}
 
 function BrandLockup() {
   return (
@@ -152,12 +235,97 @@ function SidebarButton({
   );
 }
 
+function SuperAdminSidebarButton({
+  item,
+}: {
+  item: (typeof superAdminItems)[number];
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Button
+      type="button"
+      variant="legacy"
+      size="legacy"
+      className="bs-navitem"
+      onClick={() => {
+        callLegacy((win) => win.showBsPortfolioPreview?.());
+        window.dispatchEvent(
+          new CustomEvent("ankuaru:super-admin-page", { detail: item.id }),
+        );
+      }}
+    >
+      <Icon aria-hidden="true" />
+      {item.label}
+    </Button>
+  );
+}
+
+function BankAdminSidebarButton({
+  item,
+}: {
+  item: (typeof bankAdminItems)[number];
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Button
+      type="button"
+      variant="legacy"
+      size="legacy"
+      className="bs-navitem"
+      onClick={() => {
+        callLegacy((win) => win.showBsPortfolioPreview?.());
+        window.dispatchEvent(
+          new CustomEvent("ankuaru:bank-admin-page", { detail: item.id }),
+        );
+      }}
+    >
+      <Icon aria-hidden="true" />
+      {item.label}
+    </Button>
+  );
+}
+
+function RoleEventSidebarButton({
+  item,
+  eventName,
+}: {
+  item:
+    | (typeof onboarderItems)[number]
+    | (typeof verifierItems)[number]
+    | (typeof clientItems)[number];
+  eventName: string;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Button
+      type="button"
+      variant="legacy"
+      size="legacy"
+      className="bs-navitem"
+      onClick={() => {
+        callLegacy((win) => win.showBsPortfolioPreview?.());
+        window.dispatchEvent(
+          new CustomEvent(eventName, { detail: item.id }),
+        );
+      }}
+    >
+      <Icon aria-hidden="true" />
+      {item.label}
+    </Button>
+  );
+}
+
 export function ImporterSidebar({ session }: { session: AuthSession }) {
   const portalLabel = session.role.startsWith("BANK_")
     ? "Bank Portal"
     : session.role === "SUPER_ADMIN"
       ? "Super Admin"
       : "Trading Portal";
+  const permittedNavItems = visibleNavItems(session.role);
+  const permittedUtilityItems = visibleUtilityItems(session.role);
 
   return (
     <div className="bs-sidebar">
@@ -182,11 +350,67 @@ export function ImporterSidebar({ session }: { session: AuthSession }) {
         </Button>
       </div>
       <nav className="bs-nav">
-        {navItems.map((item) => (
-          <SidebarButton key={item.id} item={item} session={session} />
-        ))}
-        <div className="bs-navdiv" />
-        {utilityItems.map((item) => (
+        {session.role === "SUPER_ADMIN" ? (
+          <>
+            {superAdminItems.map((item) => (
+              <SuperAdminSidebarButton key={item.id} item={item} />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {session.role === "BANK_ADMIN" ? (
+          <>
+            {bankAdminItems.map((item) => (
+              <BankAdminSidebarButton key={item.id} item={item} />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {session.role === "BANK_ONBOARDER" ? (
+          <>
+            {onboarderItems.map((item) => (
+              <RoleEventSidebarButton
+                key={item.id}
+                item={item}
+                eventName="ankuaru:onboarder-page"
+              />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {session.role === "BANK_VERIFIER" ? (
+          <>
+            {verifierItems.map((item) => (
+              <RoleEventSidebarButton
+                key={item.id}
+                item={item}
+                eventName="ankuaru:verifier-page"
+              />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {session.role === "CLIENT" ? (
+          <>
+            {clientItems.map((item) => (
+              <RoleEventSidebarButton
+                key={item.id}
+                item={item}
+                eventName="ankuaru:client-page"
+              />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {permittedNavItems.length > 0 ? (
+          <>
+            {permittedNavItems.map((item) => (
+              <SidebarButton key={item.id} item={item} session={session} />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
+        {permittedUtilityItems.map((item) => (
           <SidebarButton key={item.id} item={item} session={session} />
         ))}
       </nav>

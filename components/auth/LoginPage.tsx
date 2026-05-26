@@ -69,17 +69,39 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     <main className={`login-page ${isDark ? "login-page--dark" : "login-page--light"}`}>
       <section className="login-hero" aria-label="ANKUARU login">
         <div className="login-hero__copy">
-          <div className="login-logo-mark">A</div>
-          <p className="login-kicker">ANKUARU</p>
-          <h1>{t.subtitle}</h1>
-          <p>
-            Bank-backed commodity trading with LCs, performance bonds, blocked
-            funds, settlement automation, and permissioned blockchain anchoring.
-          </p>
-          <div className="login-trust-row">
-            <span>LC-backed trades</span>
-            <span>RBAC + MFA</span>
-            <span>Audit ready</span>
+          <div className="login-brochure-top">
+            <div className="login-logo-mark">A</div>
+            <div>
+              <p className="login-kicker">ANKUARU</p>
+              <span>Institutional trade finance portal</span>
+            </div>
+          </div>
+          <div className="login-brochure-body">
+            <h1>{t.subtitle}</h1>
+            <p>
+              Bank-backed commodity trading with LCs, performance bonds,
+              blocked funds, settlement automation, and permissioned blockchain
+              anchoring.
+            </p>
+            <div className="login-trust-row">
+              <span>LC-backed trades</span>
+              <span>Granular RBAC</span>
+              <span>Audit ready</span>
+            </div>
+          </div>
+          <div className="login-brochure-grid">
+            <div>
+              <strong>8</strong>
+              <span>role dashboards</span>
+            </div>
+            <div>
+              <strong>24/7</strong>
+              <span>risk oversight</span>
+            </div>
+            <div>
+              <strong>ET</strong>
+              <span>data residency</span>
+            </div>
           </div>
         </div>
 

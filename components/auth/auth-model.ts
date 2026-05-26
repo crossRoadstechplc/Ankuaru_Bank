@@ -53,8 +53,8 @@ export const demoUsers: DemoUser[] = [
     dashboardTitle: "Global System Dashboard",
     dashboardSubtitle: "Banks, markets, platform risk, and network operations.",
     welcome: "Welcome back, Super Admin",
-    defaultSection: "risk",
-    taskHint: "Review bank approvals, API credential health, and system risk.",
+    defaultSection: "portfolio",
+    taskHint: "Register banks, create Bank Admin users, and review platform controls.",
   },
   {
     id: "usr-bank-admin",
@@ -67,8 +67,8 @@ export const demoUsers: DemoUser[] = [
     dashboardTitle: "Bank Management Dashboard",
     dashboardSubtitle: "Users, clients, guarantees, exposure, and settlement tasks.",
     welcome: "Welcome back, Bank Admin",
-    defaultSection: "contracts",
-    taskHint: "Manage bank users, client limits, and pending LC approvals.",
+    defaultSection: "portfolio",
+    taskHint: "Manage internal users, client trader accounts, RBAC, and pending LC approvals.",
   },
   {
     id: "usr-bank-onboarder",
@@ -81,7 +81,7 @@ export const demoUsers: DemoUser[] = [
     dashboardTitle: "Client Onboarding Dashboard",
     dashboardSubtitle: "KYC cases, document collection, and client readiness.",
     welcome: "Welcome back, Bank Onboarder",
-    defaultSection: "actors",
+    defaultSection: "portfolio",
     taskHint: "Complete KYC tasks and respond to document requests.",
   },
   {
@@ -95,7 +95,7 @@ export const demoUsers: DemoUser[] = [
     dashboardTitle: "LC Approval & Verification Dashboard",
     dashboardSubtitle: "Pending LC requests, collateral review, and issuance actions.",
     welcome: "Welcome back, Bank Verifier",
-    defaultSection: "contracts",
+    defaultSection: "portfolio",
     taskHint: "Review LC requests and issue digital guarantees.",
   },
   {
@@ -122,7 +122,7 @@ export const demoUsers: DemoUser[] = [
     dashboardTitle: "Trading Dashboard",
     dashboardSubtitle: "Market, portfolio, orders, and guarantee requests.",
     welcome: "Welcome back, Client",
-    defaultSection: "auction",
+    defaultSection: "portfolio",
     taskHint: "Track orders, portfolio lots, and bank-backed guarantees.",
   },
   {
