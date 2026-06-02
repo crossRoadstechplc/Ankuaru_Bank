@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PortalShell } from "@/components/portal/PortalShell";
+import { loadDatabase } from "@/lib/json-db/client";
 import { AuthSession } from "./auth-model";
 import { LoginPage } from "./LoginPage";
 
@@ -10,6 +11,7 @@ const SESSION_KEY = "ankuaru.demo.session";
 export function AuthenticatedApp({ scriptSource }: { scriptSource: string }) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [ready, setReady] = useState(false);
+  const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
     const raw =
@@ -23,6 +25,10 @@ export function AuthenticatedApp({ scriptSource }: { scriptSource: string }) {
       }
     }
     setReady(true);
+
+    void loadDatabase()
+      .then(() => setDbReady(true))
+      .catch(() => setDbReady(true));
   }, []);
 
   function handleAuthenticated(nextSession: AuthSession) {
@@ -40,7 +46,7 @@ export function AuthenticatedApp({ scriptSource }: { scriptSource: string }) {
     setSession(null);
   }
 
-  if (!ready) return null;
+  if (!ready || !dbReady) return null;
 
   if (!session) {
     return <LoginPage onAuthenticated={handleAuthenticated} />;

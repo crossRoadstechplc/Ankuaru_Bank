@@ -5,9 +5,7 @@ export type UserRole =
   | "BANK_ADMIN"
   | "BANK_ONBOARDER"
   | "BANK_VERIFIER"
-  | "BANK_RISK"
   | "CLIENT"
-  | "WAREHOUSE_OPERATOR"
   | "REGULATOR";
 
 export type DemoUser = {
@@ -36,9 +34,7 @@ export const roleDestinations: Record<UserRole, string> = {
   BANK_ADMIN: "Bank Management Dashboard",
   BANK_ONBOARDER: "Client Onboarding Dashboard",
   BANK_VERIFIER: "LC Approval & Verification Dashboard",
-  BANK_RISK: "Risk & Compliance Dashboard",
   CLIENT: "Trading Dashboard",
-  WAREHOUSE_OPERATOR: "Warehouse Operations Dashboard",
   REGULATOR: "Regulator Read-Only Dashboard",
 };
 
@@ -99,20 +95,6 @@ export const demoUsers: DemoUser[] = [
     taskHint: "Review LC requests and issue digital guarantees.",
   },
   {
-    id: "usr-bank-risk",
-    name: "Solomon Tesfaye",
-    email: "risk@abaybank.et",
-    role: "BANK_RISK",
-    roleLabel: "Bank Risk / Compliance Officer",
-    bankName: "Abay Bank",
-    initials: "ST",
-    dashboardTitle: "Risk & Compliance Dashboard",
-    dashboardSubtitle: "Exposure, limit breaches, alerts, and emergency controls.",
-    welcome: "Welcome back, Risk Officer",
-    defaultSection: "risk",
-    taskHint: "Monitor exposure heatmaps and investigate active alerts.",
-  },
-  {
     id: "usr-client",
     name: "Nordic Imports B.V.",
     email: "buyer@nordic.example",
@@ -124,19 +106,6 @@ export const demoUsers: DemoUser[] = [
     welcome: "Welcome back, Client",
     defaultSection: "portfolio",
     taskHint: "Track orders, portfolio lots, and bank-backed guarantees.",
-  },
-  {
-    id: "usr-warehouse",
-    name: "Modjo Warehouse Operator",
-    email: "warehouse@ankuaru.com",
-    role: "WAREHOUSE_OPERATOR",
-    roleLabel: "Warehouse Operator",
-    initials: "WO",
-    dashboardTitle: "Warehouse Operations Dashboard",
-    dashboardSubtitle: "Warehouse receipts, delivery confirmations, and custody events.",
-    welcome: "Welcome back, Warehouse Operator",
-    defaultSection: "inv",
-    taskHint: "Confirm custody events and delivery documentation.",
   },
   {
     id: "usr-regulator",

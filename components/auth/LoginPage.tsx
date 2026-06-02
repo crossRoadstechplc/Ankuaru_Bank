@@ -1,21 +1,92 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Eye, EyeOff, Moon, ShieldCheck, Sun } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, Eye, EyeOff, Moon, ShieldCheck, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   AuthSession,
   demoUsers,
-  findDemoUser,
   Locale,
   translations,
   UserRole,
+  type DemoUser,
 } from "./auth-model";
+import { findLoginUser, listPlatformUsers, PLATFORM_USERS_UPDATED_EVENT } from "@/lib/platform-users-db";
 
 type LoginPageProps = {
   onAuthenticated: (session: AuthSession) => void;
 };
+
+type LoginRoleSelectProps = {
+  value: UserRole;
+  options: { value: UserRole; label: string }[];
+  onChange: (value: UserRole) => void;
+};
+
+function LoginRoleSelect({ value, options, onChange }: LoginRoleSelectProps) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label ?? value;
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointer(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointer);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="login-select" ref={rootRef}>
+      <button
+        type="button"
+        className="login-select__trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-labelledby="login-role-label"
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span>{selectedLabel}</span>
+        <ChevronDown aria-hidden="true" />
+      </button>
+      {open ? (
+        <ul className="login-select__menu" role="listbox" aria-label="Role">
+          {options.map((option) => (
+            <li key={option.value}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={option.value === value}
+                className={option.value === value ? "is-selected" : ""}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+              >
+                {option.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
 
 export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const [locale, setLocale] = useState<Locale>("en");
@@ -31,14 +102,53 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     message: string;
   } | null>(null);
 
+  const [loginTick, setLoginTick] = useState(0);
+
+  useEffect(() => {
+    function refresh() {
+      setLoginTick((current) => current + 1);
+    }
+    window.addEventListener(PLATFORM_USERS_UPDATED_EVENT, refresh);
+    return () =>
+      window.removeEventListener(PLATFORM_USERS_UPDATED_EVENT, refresh);
+  }, []);
+
   const t = translations[locale];
+  const loginUsers = useMemo(() => {
+    void loginTick;
+    const users = listPlatformUsers();
+    return users.length
+      ? users.filter((user) => user.status === "active").map((user) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          roleLabel: user.roleLabel,
+          bankName: user.bankName,
+          initials: user.initials,
+          dashboardTitle: user.dashboardTitle,
+          dashboardSubtitle: user.dashboardSubtitle,
+          welcome: user.welcome,
+          defaultSection: user.defaultSection,
+          taskHint: user.taskHint,
+        }))
+      : demoUsers;
+  }, [loginTick]);
+
   const selectedUser = useMemo(
-    () => findDemoUser(identifier, selectedRole),
-    [identifier, selectedRole],
+    () =>
+      findLoginUser(identifier, selectedRole) ??
+      loginUsers.find((user) => user.role === selectedRole) ??
+      loginUsers[0],
+    [identifier, selectedRole, loginUsers],
   );
 
   function authenticate(user = selectedUser) {
     if (!identifier.trim() || !password.trim()) {
+      setFeedback({ kind: "error", message: t.error });
+      return;
+    }
+    if (!user) {
       setFeedback({ kind: "error", message: t.error });
       return;
     }
@@ -57,7 +167,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     }, 450);
   }
 
-  function loginAs(user: (typeof demoUsers)[number]) {
+  function loginAs(user: DemoUser) {
     setIdentifier(user.email);
     setSelectedRole(user.role);
     authenticate(user);
@@ -66,7 +176,9 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const isDark = theme === "dark";
 
   return (
-    <main className={`login-page ${isDark ? "login-page--dark" : "login-page--light"}`}>
+    <main
+      className={`login-page ${isDark ? "login-page--dark" : "login-page--light"}`}
+    >
       <section className="login-hero" aria-label="ANKUARU login">
         <div className="login-hero__copy">
           <div className="login-brochure-top">
@@ -79,8 +191,8 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           <div className="login-brochure-body">
             <h1>{t.subtitle}</h1>
             <p>
-              Bank-backed commodity trading with LCs, performance bonds,
-              blocked funds, settlement automation, and permissioned blockchain
+              Bank-backed commodity trading with LCs, performance bonds, blocked
+              funds, settlement automation, and permissioned blockchain
               anchoring.
             </p>
             <div className="login-trust-row">
@@ -91,7 +203,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           </div>
           <div className="login-brochure-grid">
             <div>
-              <strong>8</strong>
+              <strong>6</strong>
               <span>role dashboards</span>
             </div>
             <div>
@@ -194,19 +306,17 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
             </div>
           </label>
 
-          <label className="login-field login-field--role">
-            <span>{t.role}</span>
-            <select
+          <div className="login-field login-field--role">
+            <span id="login-role-label">{t.role}</span>
+            <LoginRoleSelect
               value={selectedRole}
-              onChange={(event) => setSelectedRole(event.target.value as UserRole)}
-            >
-              {demoUsers.map((user) => (
-                <option key={user.role} value={user.role}>
-                  {user.roleLabel}
-                </option>
-              ))}
-            </select>
-          </label>
+              options={loginUsers.map((user) => ({
+                value: user.role,
+                label: user.roleLabel,
+              }))}
+              onChange={setSelectedRole}
+            />
+          </div>
 
           <div className="login-options">
             <label>
@@ -231,7 +341,12 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
               {loading ? t.verifying : t.signIn}
             </Button>
 
-            <Button type="button" variant="outline" className="login-sso" disabled>
+            <Button
+              type="button"
+              variant="outline"
+              className="login-sso"
+              disabled
+            >
               {t.sso}
             </Button>
           </div>
@@ -239,7 +354,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           <details className="login-demo" open>
             <summary className="login-demo__title">{t.demoAccess}</summary>
             <div className="login-demo__grid">
-              {demoUsers.slice(0, 6).map((user) => (
+              {loginUsers.map((user) => (
                 <Button
                   key={user.id}
                   type="button"

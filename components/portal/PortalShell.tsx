@@ -63,7 +63,7 @@ export function PortalShell({
     <>
       <div className="portal-root">
         <div className="backstage backstage--docked open" id="backstage">
-          <ImporterSidebar session={session} />
+          <ImporterSidebar session={session} onLogout={onLogout} />
           <div className="bs-content" id="bs-content">
             <div id="portfolio-dock" className="portfolio-dock">
               <TopBar session={session} onLogout={onLogout} />

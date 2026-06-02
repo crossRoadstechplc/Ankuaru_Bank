@@ -2669,56 +2669,54 @@ function renderBsRisk(){
   const infoCount=flags.filter(function(f){return f.severity==="INFO";}).length;
 
   // ─── Top status bar (command center style) ───
-  const statusBar='<div style="background:linear-gradient(180deg,#1a2235 0%,#0c1420 100%);color:#e8e6d8;border-radius:8px;padding:16px 22px;margin-bottom:18px;border:1px solid #2a3245;box-shadow:0 2px 10px rgba(0,0,0,0.2)">'+
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;border-bottom:1px solid rgba(232,230,216,.12);padding-bottom:10px">'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.14em;font-weight:700">Risk Operations · Command Center</div>'+
-    '<div style="font-size:14px;color:#c4e0d8;font-weight:600;margin-top:2px;font-family:Menlo,monospace">Market Surveillance &amp; Anomaly Detection</div></div>'+
-    '<div style="text-align:right"><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em">System Status</div>'+
-    '<div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:3px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+(criticalCount>0?"#c44":"#5a8a3a")+';box-shadow:0 0 8px '+(criticalCount>0?"rgba(196,68,68,.7)":"rgba(90,138,58,.7)")+'"></span><span style="font-size:11px;color:#c4e0d8;font-family:monospace">'+(criticalCount>0?"ALERT":"NOMINAL")+'</span></div></div></div>'+
-    // 5 metric gauges
-    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:20px">'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Emergency</div><div style="font-size:24px;font-weight:800;color:#7a0000;font-family:monospace;text-align:right">0</div></div>'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Critical</div><div style="font-size:24px;font-weight:800;color:#e06060;font-family:monospace;text-align:right">'+criticalCount+'</div></div>'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">High</div><div style="font-size:24px;font-weight:800;color:#f09060;font-family:monospace;text-align:right">'+highCount+'</div></div>'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Warn</div><div style="font-size:24px;font-weight:800;color:#e8c060;font-family:monospace;text-align:right">'+warnCount+'</div></div>'+
-    '<div><div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Info</div><div style="font-size:24px;font-weight:800;color:#90c870;font-family:monospace;text-align:right">'+infoCount+'</div></div></div>'+
-    '<div style="margin-top:14px;display:flex;align-items:center;gap:8px;font-size:9px;color:#7a88a0;font-family:monospace">'+
-    '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5a8a3a;box-shadow:0 0 6px rgba(90,138,58,.6)"></span>'+
+  const statusBar='<div class="risk-page__status">'+
+    '<div class="risk-page__status-head">'+
+    '<div class="risk-page__status-title"><div class="risk-page__status-kicker">Risk Operations · Command Center</div>'+
+    '<div class="risk-page__status-name">Market Surveillance &amp; Anomaly Detection</div></div>'+
+    '<div class="risk-page__status-badge"><div class="risk-page__status-badge-label">System Status</div>'+
+    '<div class="risk-page__status-badge-value"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+(criticalCount>0?"#c44":"#5a8a3a")+'"></span>'+(criticalCount>0?"ALERT":"NOMINAL")+'</div></div></div>'+
+    '<div class="risk-page__metrics">'+
+    '<div><span>Emergency</span><div style="font-size:24px;font-weight:800;color:#7a0000;font-family:monospace">0</div></div>'+
+    '<div><span>Critical</span><div style="font-size:24px;font-weight:800;color:#c44;font-family:monospace">'+criticalCount+'</div></div>'+
+    '<div><span>High</span><div style="font-size:24px;font-weight:800;color:#d4820a;font-family:monospace">'+highCount+'</div></div>'+
+    '<div><span>Warn</span><div style="font-size:24px;font-weight:800;color:#b8860b;font-family:monospace">'+warnCount+'</div></div>'+
+    '<div><span>Info</span><div style="font-size:24px;font-weight:800;color:#5a8a3a;font-family:monospace">'+infoCount+'</div></div></div>'+
+    '<div class="risk-page__status-foot">'+
+    '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5a8a3a"></span>'+
     'FEEDS OPERATIONAL · '+flags.length+' FLAGS · '+openFlags.length+' OPEN · DETECTOR CYCLE: STATIC SNAPSHOT'+
     '</div></div>';
 
   // ─── Market data feeds panel ───
   const feedRows=MARKET_DATA_ORDER.map(function(k){
     const m=MARKET_DATA[k];
-    const deltaColor=m.delta>0?"#5a8a3a":m.delta<0?"#c44":"#7a88a0";
+    const deltaColor=m.delta>0?"#5a8a3a":m.delta<0?"#c44":"#9a8a7a";
     const deltaArrow=m.delta>0?"▲":m.delta<0?"▼":"●";
-    return '<div style="display:grid;grid-template-columns:1fr 120px 80px;gap:14px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px">'+
-      '<div><div style="color:#c4e0d8;font-weight:600">'+m.label+'</div><div style="font-size:9px;color:#7a88a0;margin-top:2px">'+m.scope+'</div></div>'+
-      '<div style="text-align:right"><span style="color:#e8e6d8;font-weight:700;font-family:monospace;font-size:13px">'+m.value.toLocaleString()+'</span> <span style="color:#7a88a0;font-size:10px">'+m.unit+'</span></div>'+
-      '<div style="text-align:right;font-family:monospace;font-size:11px;color:'+deltaColor+';font-weight:700">'+deltaArrow+' '+(m.delta>0?"+":"")+m.delta+'</div>'+
+    return '<div class="risk-feed-row">'+
+      '<div><strong>'+m.label+'</strong><small>'+m.scope+'</small></div>'+
+      '<div class="risk-feed-value">'+m.value.toLocaleString()+' <span class="risk-feed-unit">'+m.unit+'</span></div>'+
+      '<div class="risk-feed-delta" style="color:'+deltaColor+'">'+deltaArrow+' '+(m.delta>0?"+":"")+m.delta+'</div>'+
       '</div>';
   }).join("");
-  const marketPanel='<div style="background:#0c1420;border-radius:6px;overflow:hidden;margin-bottom:18px;border:1px solid #2a3245">'+
-    '<div style="background:#1a2235;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a3245">'+
-    '<div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Market Data Feeds · Live</div>'+
-    '<div style="font-size:9px;color:#7a88a0;font-family:monospace">9 feeds · updated '+MARKET_DATA.NYC_ARABICA.updated+'</div></div>'+
+  const marketPanel='<div class="risk-panel">'+
+    '<div class="risk-panel__head"><span>Market Data Feeds · Live</span>'+
+    '<span class="risk-panel__head-meta">9 feeds · updated '+MARKET_DATA.NYC_ARABICA.updated+'</span></div>'+
     feedRows+'</div>';
 
   // ─── Alerts queue ───
   let alertQueue;
   if(flags.length===0){
-    alertQueue='<div style="padding:40px 20px;text-align:center;background:#0c1420;border:1px dashed #2a3245;border-radius:6px"><div style="font-family:monospace;font-size:11px;color:#7a88a0">// NO FLAGS RAISED · ALL SYSTEMS NOMINAL</div></div>';
+    alertQueue='<div class="risk-empty">// NO FLAGS RAISED · ALL SYSTEMS NOMINAL</div>';
   } else {
-    alertQueue='<div style="background:#0c1420;border:1px solid #2a3245;border-radius:6px;overflow:hidden">'+
-      '<div style="background:#1a2235;padding:10px 14px;display:grid;grid-template-columns:90px 100px 1fr 100px 80px;gap:12px;font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;font-weight:700"><div>Flag ID</div><div>Severity</div><div>Pattern / Detail</div><div>Target</div><div style="text-align:right">Conf</div></div>'+
+    alertQueue='<div class="risk-alert-table">'+
+      '<div class="risk-alert-head"><div>Flag ID</div><div>Severity</div><div>Pattern / Detail</div><div>Target</div><div style="text-align:right">Conf</div></div>'+
       flags.map(function(f){
         const sev=ALERT_SEVERITY[f.severity]||{label:"?",color:"#666"};
-        return '<div onclick="closeBackstage();flgShowDetail(\''+f.id+'\')" style="display:grid;grid-template-columns:90px 100px 1fr 100px 80px;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;font-size:11px;color:#e8e6d8">'+
-          '<div style="font-family:monospace;font-weight:700;color:#c4a06a">'+f.id+'</div>'+
+        return '<div class="risk-alert-row" onclick="closeBackstage();flgShowDetail(\''+f.id+'\')">'+
+          '<div class="risk-alert-id">'+f.id+'</div>'+
           '<div><span style="background:'+sev.color+';color:#fff;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.04em">'+sev.label+'</span></div>'+
-          '<div><div style="color:#c4e0d8;font-weight:600">'+f.patternLabel+'</div><div style="font-size:9px;color:#7a88a0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+f.detail.substring(0,80)+(f.detail.length>80?"…":"")+'</div></div>'+
-          '<div style="font-family:monospace;font-size:10px;color:#90c8e0">'+f.targetId+'</div>'+
-          '<div style="text-align:right;font-family:monospace;font-size:11px;color:#e8c060;font-weight:700">'+(f.confidence*100).toFixed(0)+'%</div>'+
+          '<div><div class="risk-alert-pattern">'+f.patternLabel+'</div><div class="risk-alert-detail">'+f.detail.substring(0,80)+(f.detail.length>80?"…":"")+'</div></div>'+
+          '<div class="risk-alert-target">'+f.targetId+'</div>'+
+          '<div class="risk-alert-conf">'+(f.confidence*100).toFixed(0)+'%</div>'+
           '</div>';
       }).join("")+
       '</div>';
@@ -2728,33 +2726,37 @@ function renderBsRisk(){
   const patternChips=Object.entries(FRAUD_PATTERNS).map(function(e){
     const k=e[0],p=e[1];
     const activeFlags=Object.values(ANOMALY_FLAGS).filter(function(f){return f.pattern===k;}).length;
-    const glow=p.active?(activeFlags>0?"box-shadow:0 0 8px rgba(232,192,96,.3);":""):"opacity:.45;";
-    const bg=p.active?(activeFlags>0?"#2a1a08":"#1a2235"):"#0c1420";
-    const border=p.active?(activeFlags>0?"#c4a06a":"#2a3245"):"#2a3245";
-    return '<div style="padding:8px 11px;background:'+bg+';border:1px solid '+border+';border-radius:4px;'+glow+'">'+
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:3px"><span style="font-size:10px;color:#c4e0d8;font-weight:700">'+p.label+'</span>'+(activeFlags>0?'<span style="background:#c44;color:#fff;padding:1px 5px;border-radius:6px;font-size:8px;font-weight:700">'+activeFlags+'</span>':'')+'</div>'+
-      '<div style="font-size:9px;color:#7a88a0">'+p.category+(p.surveillance?" · surveillance":"")+'</div>'+
-      '<div style="font-size:9px;color:#7a88a0;margin-top:4px;line-height:1.4">'+p.desc+'</div>'+
+    const chipClass='risk-chip'+(p.active?'':' is-dim')+(p.active&&activeFlags>0?' is-hot':'');
+    return '<div class="'+chipClass+'">'+
+      '<div class="risk-chip__title"><span>'+p.label+'</span>'+(activeFlags>0?'<span class="risk-chip__count">'+activeFlags+'</span>':'')+'</div>'+
+      '<div class="risk-chip__meta">'+p.category+(p.surveillance?" · surveillance":"")+'</div>'+
+      '<div class="risk-chip__desc">'+p.desc+'</div>'+
       '</div>';
   }).join("");
-  const patternPanel='<div style="background:#0c1420;border:1px solid #2a3245;border-radius:6px;padding:14px;margin-bottom:18px">'+
-    '<div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:10px">Pattern Library · '+Object.keys(FRAUD_PATTERNS).length+' Detectors</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">'+patternChips+'</div></div>';
+  const patternPanel='<div class="risk-pattern-panel">'+
+    '<div class="risk-page__section-label" style="margin-bottom:12px">Pattern Library · '+Object.keys(FRAUD_PATTERNS).length+' Detectors</div>'+
+    '<div class="risk-pattern-grid">'+patternChips+'</div></div>';
 
-  return '<div class="bsc" style="background:#0c1420;color:#e8e6d8;margin:-30px -30px -30px -30px;padding:30px 30px;min-height:100vh">'+
-    '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">'+
-    '<div><div style="font-size:9px;color:#7a88a0;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Platform Risk · Command Center</div>'+
-    '<div class="bsc-title" style="margin-bottom:0;color:#e8e6d8;font-family:Menlo,monospace">Risk &amp; Market Monitoring</div></div>'+
-    '<div style="font-size:10px;color:#7a88a0;text-align:right;font-family:monospace">'+flags.length+' flags · 9 feeds · '+Object.keys(FRAUD_PATTERNS).length+' detectors</div></div>'+
-    '<div style="font-size:11px;color:#7a88a0;margin-bottom:18px;max-width:780px;font-family:Menlo,monospace">Cross-cutting observation layer. Reads event stream from all layers. Emits flags, alerts, reputation updates. Serves actors, banks, insurers, platform ops, regulators at scoped tiers. Current mode: <span style="color:#c4a06a">STATIC SNAPSHOT</span> (Option A).</div>'+
+  return '<div class="risk-page"><div class="risk-page__inner">'+
+    '<header class="risk-page__header">'+
+    '<div class="risk-page__eyebrow">Platform Risk · Command Center</div>'+
+    '<div class="bsc-title">Risk &amp; Market Monitoring</div>'+
+    '<div class="risk-page__meta">'+flags.length+' flags · 9 feeds · '+Object.keys(FRAUD_PATTERNS).length+' detectors</div>'+
+    '</header>'+
+    '<p class="risk-page__intro">Cross-cutting observation layer. Reads event stream from all layers. Emits flags, alerts, reputation updates. Serves actors, banks, insurers, platform ops, regulators at scoped tiers. Current mode: <span style="color:#A87832;font-weight:600">STATIC SNAPSHOT</span> (Option A).</p>'+
     statusBar+
-    '<div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Market Data Feeds</div>'+
+    '<section class="risk-page__section">'+
+    '<div class="risk-page__section-label">Market Data Feeds</div>'+
     marketPanel+
-    '<div style="font-size:9px;color:#7a88a0;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Active Alerts Queue</div>'+
+    '</section>'+
+    '<section class="risk-page__section">'+
+    '<div class="risk-page__section-label">Active Alerts Queue</div>'+
     alertQueue+
-    '<div style="margin-top:18px"></div>'+
+    '</section>'+
+    '<section class="risk-page__section">'+
     patternPanel+
-    '</div>';
+    '</section>'+
+    '</div></div>';
 }
 
 function renderBsInsurance(){
@@ -3286,28 +3288,117 @@ function renderBsAccount(){
   </div>`;
 }
 function renderBsSettings(){
-  const settings=[
-    {l:"Email notifications",s:"Receive milestone alerts via email",on:true},
-    {l:"SMS notifications",s:"Receive critical alerts via SMS",on:true},
-    {l:"In-app notifications",s:"Show notifications within the portal",on:true},
-    {l:"Timeline view by default",s:"Open portfolio in timeline view",on:false},
-    {l:"Auto-expand trace on open",s:"Expand full trace tree when opening a contract",on:false},
-    {l:"Show SCA scores on cards",s:"Display cupping score on contract cards",on:true},
+  const notificationSettings=[
+    {id:"email",l:"Email notifications",s:"Milestone alerts, LC updates, and settlement reminders",on:true,icon:"✉"},
+    {id:"sms",l:"SMS notifications",s:"Critical alerts for overdue milestones and document gaps",on:true,icon:"📱"},
+    {id:"inapp",l:"In-app notifications",s:"Badge and toast alerts while you work in the portal",on:true,icon:"🔔"},
   ];
-  return`<div class="bsc">
-    <div class="bsc-title">Settings</div>
-    <div class="bsc-sub">Preferences for notifications, display, and defaults.</div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:0 16px;margin-bottom:16px">
-      ${settings.map(s=>`<div class="bs-setting">
-        <div><div class="bs-s-label">${s.l}</div><div class="bs-s-sub">${s.s}</div></div>
-        <button class="bs-toggle${s.on?" on":""}" onclick="this.classList.toggle('on')"></button>
-      </div>`).join("")}
+  const portfolioSettings=[
+    {id:"timeline",l:"Timeline view by default",s:"Open portfolio in timeline view instead of cards",on:false,icon:"📅"},
+    {id:"trace",l:"Auto-expand trace on open",s:"Expand the full trace tree when opening a contract",on:false,icon:"🌳"},
+    {id:"sca",l:"Show SCA scores on cards",s:"Display cupping score badges on contract cards",on:true,icon:"☕"},
+  ];
+  const displayOptions=[
+    {k:"Language",v:"English (UK)",options:["English (UK)","English (US)","Amharic"]},
+    {k:"Currency",v:"USD",options:["USD","EUR","ETB"]},
+    {k:"Date format",v:"DD MMM YYYY",options:["DD MMM YYYY","MM/DD/YYYY","YYYY-MM-DD"]},
+    {k:"Weight unit",v:"Metric (kg / mt)",options:["Metric (kg / mt)","Imperial (lb / t)"]},
+  ];
+  const securityItems=[
+    {l:"Two-factor authentication",s:"Required for bank staff and high-value approvals",status:"Enabled",tone:"ok"},
+    {l:"Session timeout",s:"Auto sign-out after 30 minutes of inactivity",status:"30 min",tone:"neutral"},
+    {l:"Audit log export",s:"Download platform activity for compliance review",status:"Available",tone:"neutral"},
+  ];
+  const renderToggle=(on)=>`<button type="button" class="bs-toggle${on?" on":""}" aria-pressed="${on?"true":"false"}" aria-label="Toggle setting" onclick="toggleBsSetting(this)"></button>`;
+  const renderSettingRow=(item)=>`<div class="bs-setting">
+        <div class="bs-setting__icon" aria-hidden="true">${item.icon}</div>
+        <div class="bs-setting__copy">
+          <div class="bs-s-label">${item.l}</div>
+          <div class="bs-s-sub">${item.s}</div>
+        </div>
+        ${renderToggle(item.on)}
+      </div>`;
+  return`<div class="bsc settings-page">
+    <div class="settings-page__hero">
+      <div class="settings-page__hero-top">
+        <div class="settings-page__eyebrow">Platform preferences</div>
+        <div class="settings-page__badge">Workspace</div>
+      </div>
+      <div class="bsc-title settings-page__title">Settings</div>
+      <p class="settings-page__intro">Control notifications, portfolio defaults, regional formats, and security preferences for your ANKUARU workspace.</p>
     </div>
-    <div style="font-size:11px;font-weight:600;color:var(--tx);margin-bottom:8px">Display</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      ${[["Language","English (UK)"],["Currency","USD"],["Date Format","DD MMM YYYY"],["Weight Unit","Metric (kg / mt)"]].map(([k,v])=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px"><div style="font-size:10px;color:var(--tx3);margin-bottom:4px">${k}</div><div style="font-size:12px;font-weight:500;color:var(--tx)">${v}</div></div>`).join("")}
+
+    <div class="settings-page__grid">
+      <section class="settings-card settings-card--wide">
+        <div class="settings-card__head">
+          <div>
+            <h3>Notifications</h3>
+            <p>Choose how ANKUARU reaches you for trade and compliance events.</p>
+          </div>
+          <span class="settings-card__pill">3 active</span>
+        </div>
+        <div class="settings-card__body settings-card__body--stack">
+          ${notificationSettings.map(renderSettingRow).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card__head">
+          <div>
+            <h3>Portfolio & display</h3>
+            <p>Defaults for contract cards, trace views, and scoring.</p>
+          </div>
+        </div>
+        <div class="settings-card__body settings-card__body--stack">
+          ${portfolioSettings.map(renderSettingRow).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card__head">
+          <div>
+            <h3>Regional formats</h3>
+            <p>Language, currency, and measurement preferences.</p>
+          </div>
+        </div>
+        <div class="settings-card__body settings-card__body--grid">
+          ${displayOptions.map((opt)=>`<label class="settings-field">
+              <span>${opt.k}</span>
+              <select class="settings-select" onchange="toast('Updated ${opt.k.toLowerCase()} preference')">
+                ${opt.options.map((o)=>`<option${o===opt.v?" selected":""}>${o}</option>`).join("")}
+              </select>
+            </label>`).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card settings-card--wide">
+        <div class="settings-card__head">
+          <div>
+            <h3>Security & compliance</h3>
+            <p>Session, authentication, and audit controls for this account.</p>
+          </div>
+        </div>
+        <div class="settings-card__body settings-card__body--security">
+          ${securityItems.map(item=>`<div class="settings-security-row">
+              <div>
+                <div class="bs-s-label">${item.l}</div>
+                <div class="bs-s-sub">${item.s}</div>
+              </div>
+              <span class="settings-status settings-status--${item.tone}">${item.status}</span>
+            </div>`).join("")}
+        </div>
+      </section>
+    </div>
+
+    <div class="settings-page__actions">
+      <button type="button" class="settings-btn settings-btn--ghost" onclick="toast('Settings reset to defaults')">Reset defaults</button>
+      <button type="button" class="settings-btn settings-btn--primary" onclick="toast('Settings saved')">Save preferences</button>
     </div>
   </div>`;
+}
+function toggleBsSetting(button){
+  const on=button.classList.toggle("on");
+  button.setAttribute("aria-pressed",on?"true":"false");
 }
 function renderBsHelp(){
   return`<div class="bsc">

@@ -6,11 +6,14 @@ import {
   BriefcaseBusiness,
   CircleUserRound,
   CreditCard,
+  FileImage,
   FileText,
   FolderOpen,
   Gavel,
   Landmark,
   KeyRound,
+  Link2,
+  LogOut,
   Package,
   PlusSquare,
   Repeat2,
@@ -62,13 +65,16 @@ const utilityItems = [
 const superAdminItems = [
   { id: "bank-registration", label: "Register Bank", icon: Building2 },
   { id: "bank-admin", label: "Create Bank Admin", icon: UserPlus },
-  { id: "credentials", label: "API Credentials", icon: KeyRound },
+  { id: "user-accounts", label: "User Accounts", icon: UsersRound },
+  { id: "bank-directory", label: "Bank Directory", icon: BriefcaseBusiness },
 ] as const;
 
 const bankAdminItems = [
   { id: "internal-users", label: "Internal Users", icon: UserCog },
   { id: "client-accounts", label: "Client Accounts", icon: BriefcaseBusiness },
   { id: "rbac", label: "RBAC Permissions", icon: SlidersHorizontal },
+  { id: "document-assets", label: "PDF Signature & Stamp", icon: FileImage },
+  { id: "contract-anchor", label: "Verify On-Chain", icon: Link2 },
 ] as const;
 
 const onboarderItems = [
@@ -82,11 +88,19 @@ const verifierItems = [
   { id: "verification", label: "Complete Verification", icon: Shield },
   { id: "issue-lc", label: "Issue LC", icon: KeyRound },
   { id: "generate-contract", label: "Generate Contract", icon: FileText },
+  { id: "contract-anchor", label: "Verify On-Chain", icon: Link2 },
 ] as const;
 
 const clientItems = [
   { id: "registration", label: "Registration", icon: UserPlus },
-  { id: "status", label: "Track Status", icon: SlidersHorizontal },
+  { id: "status", label: "Account & Trades", icon: SlidersHorizontal },
+  { id: "contract-anchor", label: "Verify On-Chain", icon: Link2 },
+] as const;
+
+const regulatorItems = [
+  { id: "contracts", label: "LCs & Contracts", icon: FileText },
+  { id: "contract-anchor", label: "Verify On-Chain", icon: Link2 },
+  { id: "settlement", label: "DvP Settlement", icon: Repeat2 },
 ] as const;
 
 const roleMenuAccess: Record<
@@ -109,20 +123,12 @@ const roleMenuAccess: Record<
     nav: ["contracts", "settlement"],
     utility: ["account", "help"],
   },
-  BANK_RISK: {
-    nav: ["contracts", "settlement"],
-    utility: ["risk", "account", "help"],
-  },
   CLIENT: {
     nav: ["auction", "exporters"],
     utility: ["account", "help"],
   },
-  WAREHOUSE_OPERATOR: {
-    nav: ["inv", "quality", "settlement"],
-    utility: ["account", "help"],
-  },
   REGULATOR: {
-    nav: ["contracts", "settlement"],
+    nav: [],
     utility: ["risk", "account", "help"],
   },
 };
@@ -202,6 +208,18 @@ function getRoleLabel(session: AuthSession, id: string, fallback: string) {
   return bankLabels[id] ?? fallback;
 }
 
+const bankAdminNavRoutes: Record<string, string> = {
+  contracts: "contracts",
+  settlement: "settlement",
+  actors: "actors",
+  risk: "risk",
+};
+
+const regulatorNavRoutes: Record<string, string> = {
+  contracts: "contracts",
+  settlement: "settlement",
+};
+
 function SidebarButton({
   item,
   session,
@@ -220,6 +238,32 @@ function SidebarButton({
       id={`bsn-${item.id}`}
       title={"title" in item ? item.title : undefined}
       onClick={(event) => {
+        if (
+          session.role === "BANK_ADMIN" &&
+          item.id in bankAdminNavRoutes
+        ) {
+          callLegacy((win) => win.showBsPortfolioPreview?.());
+          window.dispatchEvent(
+            new CustomEvent("ankuaru:bank-admin-page", {
+              detail: bankAdminNavRoutes[item.id],
+            }),
+          );
+          return;
+        }
+
+        if (
+          session.role === "REGULATOR" &&
+          item.id in regulatorNavRoutes
+        ) {
+          callLegacy((win) => win.showBsPortfolioPreview?.());
+          window.dispatchEvent(
+            new CustomEvent("ankuaru:regulator-page", {
+              detail: regulatorNavRoutes[item.id],
+            }),
+          );
+          return;
+        }
+
         if ("onClick" in item && item.onClick) {
           item.onClick(event.currentTarget);
           return;
@@ -294,7 +338,8 @@ function RoleEventSidebarButton({
   item:
     | (typeof onboarderItems)[number]
     | (typeof verifierItems)[number]
-    | (typeof clientItems)[number];
+    | (typeof clientItems)[number]
+    | (typeof regulatorItems)[number];
   eventName: string;
 }) {
   const Icon = item.icon;
@@ -318,7 +363,13 @@ function RoleEventSidebarButton({
   );
 }
 
-export function ImporterSidebar({ session }: { session: AuthSession }) {
+export function ImporterSidebar({
+  session,
+  onLogout,
+}: {
+  session: AuthSession;
+  onLogout: () => void;
+}) {
   const portalLabel = session.role.startsWith("BANK_")
     ? "Bank Portal"
     : session.role === "SUPER_ADMIN"
@@ -402,6 +453,18 @@ export function ImporterSidebar({ session }: { session: AuthSession }) {
             <div className="bs-navdiv" />
           </>
         ) : null}
+        {session.role === "REGULATOR" ? (
+          <>
+            {regulatorItems.map((item) => (
+              <RoleEventSidebarButton
+                key={item.id}
+                item={item}
+                eventName="ankuaru:regulator-page"
+              />
+            ))}
+            <div className="bs-navdiv" />
+          </>
+        ) : null}
         {permittedNavItems.length > 0 ? (
           <>
             {permittedNavItems.map((item) => (
@@ -414,26 +477,18 @@ export function ImporterSidebar({ session }: { session: AuthSession }) {
           <SidebarButton key={item.id} item={item} session={session} />
         ))}
       </nav>
-      <Button
-        type="button"
-        variant="legacy"
-        size="legacy"
-        className="bs-back"
-        onClick={() => callLegacy((win) => win.closeBackstage?.())}
-      >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          aria-hidden="true"
+      <div className="bs-sidebar-footer">
+        <button
+          type="button"
+          className="bs-back bs-back--logout"
+          id="bsn-logout"
+          title="Sign out"
+          onClick={onLogout}
         >
-          <path d="M10 3L5 8l5 5" />
-        </svg>
-        Back to Portfolio
-      </Button>
+          <LogOut width={12} height={12} strokeWidth={2} aria-hidden="true" />
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
