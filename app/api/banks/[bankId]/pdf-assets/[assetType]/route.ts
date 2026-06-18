@@ -5,6 +5,7 @@ import {
 } from "@/lib/pdf/bank-assets-server";
 import {
   bankAssetFilename,
+  deleteBankAssetFile,
   readBankAssetFile,
   writeBankAssetFile,
 } from "@/lib/pdf/bank-assets-storage";
@@ -41,7 +42,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
   const assetType = rawType as BankPdfAssetType;
   const pdfAssets = getBankPdfAssetsFromDb(bankId);
   const filename = resolveAssetFilename(bankId, assetType, pdfAssets);
-  const bytes = readBankAssetFile(bankId, filename);
+  const bytes = await readBankAssetFile(bankId, filename);
 
   if (!bytes) {
     return NextResponse.json({ error: "Asset not uploaded yet." }, { status: 404 });
@@ -88,7 +89,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
-  writeBankAssetFile(bankId, filename, bytes);
+  await writeBankAssetFile(bankId, filename, bytes);
 
   const patch =
     assetType === "signature"
@@ -117,10 +118,14 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   }
 
   const assetType = rawType as BankPdfAssetType;
+  const pdfAssets = getBankPdfAssetsFromDb(bankId);
+  const filename = resolveAssetFilename(bankId, assetType, pdfAssets);
   const patch =
     assetType === "signature"
       ? { signatureFile: undefined }
       : { verifierStampFile: undefined };
+
+  await deleteBankAssetFile(bankId, filename);
 
   const bank = patchBankPdfAssetsInDb(bankId, patch);
   if (!bank) {

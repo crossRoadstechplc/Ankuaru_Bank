@@ -67,19 +67,19 @@ export async function loadBankDocumentImages(
   const defaults = await loadSignatureImages(doc);
   const defaultStamp = await loadVerifierStamp(doc);
 
-  const signatureFile = resolveBankAssetFilename(
+  const signatureFile = await resolveBankAssetFilename(
     bankId,
     "signature",
     pdfAssets?.signatureFile,
   );
-  const stampFile = resolveBankAssetFilename(
+  const stampFile = await resolveBankAssetFilename(
     bankId,
     "verifier-stamp",
     pdfAssets?.verifierStampFile,
   );
 
-  const signatureBytes = readBankAssetFile(bankId, signatureFile ?? undefined);
-  const stampBytes = readBankAssetFile(bankId, stampFile ?? undefined);
+  const signatureBytes = await readBankAssetFile(bankId, signatureFile ?? undefined);
+  const stampBytes = await readBankAssetFile(bankId, stampFile ?? undefined);
 
   const bankSignature = signatureBytes
     ? await embedBytes(doc, signatureBytes, signatureFile ?? "signature.png")
