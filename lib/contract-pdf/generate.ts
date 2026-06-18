@@ -44,7 +44,7 @@ export async function generateAndStoreContractPdf(
 
   const bank = resolveBankPdfContext(contract.bankId);
   const pdfBytes = await buildContractPdf(contract, bank);
-  writeContractPdf(contractUid, pdfBytes);
+  await writeContractPdf(contractUid, pdfBytes);
 
   const pdfPath = contractPdfFileName(contractUid);
   const db = readDatabase();
@@ -60,7 +60,7 @@ export async function generateAndStoreContractPdf(
 }
 
 export async function getContractPdf(contractUid: string) {
-  if (contractPdfExists(contractUid)) {
+  if (await contractPdfExists(contractUid)) {
     return readContractPdf(contractUid);
   }
 
