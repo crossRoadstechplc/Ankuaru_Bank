@@ -24,6 +24,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Contract not found." }, { status: 404 });
   }
 
+  const acceptHeader = request.headers.get("accept") || "";
+  if (acceptHeader.includes("application/pdf")) {
+    return new NextResponse(new Uint8Array(result.pdfBytes), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${result.contract.contractUid}.pdf"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     contractUid: result.contract.contractUid,
