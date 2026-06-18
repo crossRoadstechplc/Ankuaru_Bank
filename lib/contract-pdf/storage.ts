@@ -1,13 +1,21 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
   blobObjectExists,
   isBlobStorageEnabled,
   putBlobObject,
   readBlobObject,
 } from "@/lib/storage/blob";
-
-const CONTRACTS_DIR = join(process.cwd(), "data", "contracts");
+const CONTRACTS_DIR =
+  process.env.VERCEL === "1"
+    ? join(tmpdir(), "ankuaru-bank", "contracts")
+    : join(process.cwd(), "data", "contracts");
+const CONTRACTS_DIR =
+  process.env.VERCEL === "1"
+    ? join(tmpdir(), "ankuaru-bank", "contracts")
+    : join(process.cwd(), "data", "contracts");
 const CONTRACTS_BLOB_PREFIX = "contracts";
 
 export function ensureContractsDir() {
