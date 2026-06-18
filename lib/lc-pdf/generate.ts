@@ -39,7 +39,7 @@ export async function generateAndStoreLcPdf(
 
   const bank = resolveBankPdfContext(lc.bankId);
   const pdfBytes = await buildLcPdf(lc, bank);
-  writeLcPdf(lcUid, pdfBytes);
+  await writeLcPdf(lcUid, pdfBytes);
 
   const pdfPath = lcPdfFileName(lcUid);
   const db = readDatabase();
@@ -55,7 +55,7 @@ export async function generateAndStoreLcPdf(
 }
 
 export async function getLcPdf(lcUid: string) {
-  if (lcPdfExists(lcUid)) {
+  if (await lcPdfExists(lcUid)) {
     return readLcPdf(lcUid);
   }
 
